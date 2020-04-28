@@ -1,20 +1,100 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello ProduitController!{% endblock %}
+{% block title %}Produits{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+    <div class="col-lg-8  contenu-blanc shadow-lg">
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code><a href="{{ 'C:/wamp64/www/Maya/src/Controller/ProduitController.php'|file_link(0) }}">src/Controller/ProduitController.php</a></code></li>
-        <li>Your template at <code><a href="{{ 'C:/wamp64/www/Maya/templates/produit/index.html.twig'|file_link(0) }}">templates/produit/index.html.twig</a></code></li>
-    </ul>
-</div>
+        <h1>Les produits</h1>
+        {# formulaire de recherche des produits #}
+        {{ form_start(formRecherche) }}
+        <div class="container-fluid contenu">
+            <div class="row">
+                <div class="col-md-8 row font-weight-bold">
+                    <div class="col-md-6">{{ form_label(formRecherche.libelle) }}</div>
+                    <div class="col-md-3">{{ form_label(formRecherche.prixMini) }}</div>
+                    <div class="col-md-3">{{ form_label(formRecherche.prixMaxi) }}</div>
+                </div>
+            </div>
+
+            <div class="row">
+
+                <div class="col-md-8 row">
+                    <div class="col-md-6">{{ form_widget(formRecherche.libelle) }}</div>
+                    <div class="col-md-3">{{ form_widget(formRecherche.prixMini) }}</div>
+                    <div class="col-md-3">{{ form_widget(formRecherche.prixMaxi) }}</div>
+                </div>
+
+                <div class="col-md-4">
+                    <button class="btn btn-primary btn-sm" type="submit" formaction="{{ path('produit') }}" title="Afficher les produits"><i class="fa fa-save"></i> Afficher</button>
+                    <button class="btn btn-info btn-sm" type="reset" title="Effacer la saisie"><i class="fa fa-eraser"></i> Effacer</button>
+                </div>
+
+            </div>
+        </div>
+        {{ form_end(formRecherche) }}
+
+        <div class="container-fluid contenu">
+
+        <div class="container-fluid contenu">
+
+            <table class="table table-striped table-advance table-hover">
+                <thead>
+                <tr class="bg-entete">
+                    <th class="col-md-1">Identifiant</th>
+                    <th>Libellé</th>
+                    <th>Catégorie</th>
+                    <th class="col-md-1">Prix</th>
+                    <th class="col-md-6">Actions<span class="pull-right" ><a href="{{ path('produit_ajouter')}}" class="btn btn-primary btn-sm"><i class="fa fa-save"></i> Ajouter nouveau produit</a></span></th>
+                </tr>
+                </thead>
+                <tbody>
+
+                {% for key, produit in lesProduits %}
+                    <tr>
+                        <td>{{ produit.id }}</td>
+                        <td>{{ produit.libelle }}</td>
+                        <td>{{ produit.categorie.getLibelle() }}</td>
+                        <td>{{ produit.getPrix() | number_format(2, ',', ' ') }}</td>
+                        <td class="row">
+
+                            <!-- formulaire pour demander la modification ou la suppression -->
+                            <form>
+                                <button type="submit" class="btn btn-primary btn-sm" formaction="" title="Modifier"><i class="fa fa-pencil"></i> Modifier</button>
+                                <button type="submit" class="btn btn-danger btn-sm"  formaction= "{{ path('produit_supprimer', {'id' : produit.id }) }}"title="Supprimer" onclick="return confirm('Voulez-vous vraiment supprimer ce produit ?');"><i class="fa fa-trash-o "></i> Supprimer</button>
+                                <input type = "hidden" name="_token" value="{{ csrf_token('action-item' ~ produit.id) }}">  {#  ~     pour concaténer des chaines en twig #}
+                            </form>
+
+                        </td>
+                    </tr>
+                {% for key, produit in lesProduits %}
+                <tr>
+                    <td>{{ produit.id }}</td>
+                    <td>{{ produit.libelle }}</td>
+                    <td>{{ produit.categorie.getLibelle() }}</td>
+                    <td>{{ produit.getPrix() | number_format(2, ',', ' ') }}</td>
+                    <td class="row">
+
+                        <!-- formulaire pour demander la modification ou la suppression -->
+                        <form>
+                            <button type="submit" class="btn btn-primary btn-sm" formaction="{{ path('produit_modifier', {'id' : produit.id }) }}" title="Modifier"><i class="fa fa-pencil"></i> Modifier</button>
+                            <button type="submit" class="btn btn-danger btn-sm"  formaction=""  title="Supprimer" onclick="return confirm('Voulez-vous vraiment supprimer ce produit ?');"><i class="fa fa-trash-o "></i> Supprimer</button>
+                            <input type = "hidden" name="_token" value="{{ csrf_token('action-item' ~ produit.id) }}">  {#  ~     pour concaténer des chaines en twig #}
+                        </form>
+
+                    </td>
+
+                    {% endfor %}
+                </tbody>
+            </table>
+            {# display navigation #}
+            <div class="navigation">
+                {{ knp_pagination_render(lesProduits) }}
+            </div>
+
+
+        </div>
+    </div>
+
 {% endblock %}
